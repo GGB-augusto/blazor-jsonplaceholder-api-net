@@ -1,0 +1,37 @@
+﻿@page "/"
+@using System.Text.Json
+
+<PageTitle>Usuários</PageTitle>
+
+<h1>Primeiro Usuário da Lista</h1>
+
+<p><b>Nome:</b> @nome</p>
+<p><b>Cidade:</b> @cidade</p>
+<p><b>Empresa:</b> @empresa</p>
+
+@code {
+    private string nome = "";
+    private string cidade = "";
+    private string empresa = "";
+
+    // roda sozinho quando a pagina abre
+    protected override async Task OnInitializedAsync()
+    {
+        HttpClient cliente = new HttpClient();
+        string resposta = await cliente.GetStringAsync("https://jsonplaceholder.typicode.com/users");
+
+        JsonDocument json = JsonDocument.Parse(resposta);
+
+        // a api devolve uma lista, o [0] pega a primeira pessoa
+        JsonElement primeiro = json.RootElement[0];
+
+        nome = primeiro.GetProperty("name").GetString() ?? "";
+        cidade = primeiro.GetProperty("address").GetProperty("city").GetString() ?? "";
+        empresa = primeiro.GetProperty("company").GetProperty("name").GetString() ?? "";
+
+        // imprime tambem no terminal
+        Console.WriteLine("Nome: " + nome);
+        Console.WriteLine("Cidade: " + cidade);
+        Console.WriteLine("Empresa: " + empresa);
+    }
+}
